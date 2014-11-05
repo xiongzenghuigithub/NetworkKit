@@ -48,14 +48,32 @@ typedef void (^NetworkUnRechable)(Reachability * rechability);
 
 + (Reachability *)reachabilityForLocalWiFi;
 
-/** 检查网络请求是否可到达指定的 - 主机域名,如: www.baidu.com */
+/** 检查网络请求是否可到达指定的，获得对主机域名的连接引用 - 主机域名,如: www.baidu.com */
 + (Reachability *)reachableWithHostName:(NSString *)hostName;
 
-/** 检查网络请求是否可到达指定的 - ip地址 */
-+ (Reachability *)reachableWithIPAddress:(struct sockaddr_in *)addr;
+/** 检查网络请求是否可到达指定的，获得对IP地址的连接引用 - ip地址 */
++ (Reachability *)reachableWithIPAddress:(const struct sockaddr_in *)addr;
 
 /** 根据检查到得到达主机情况创建Rechability对象  */
 + (Reachability *)getReachableIntsanceWithReachaRef:(SCNetworkReachabilityRef)reachaRef;
+
+//获取当前Reachability的到达结果(由链接引用获取)
+- (BOOL)isReachable;
+- (BOOL)isReachableViaWWAN;
+- (BOOL)isReachableViaWiFi;
+
+/** 开起监听手机网络状态 */
+-(BOOL)startNotifier;
+
+/** 停止监听手机网络状态 */
+-(void)stopNotifier;
+
+/** 是否需要建立连接 */
+- (BOOL)connectionRequired;
+- (BOOL)isConnectionOnDemand;
+
+/** 获取当前网络连接状态 */
+- (NetworkStatus)currentReachabilityStatus;
 
 static void convertNSStringIP(struct sockaddr_in * addr, NSString * ip);
 

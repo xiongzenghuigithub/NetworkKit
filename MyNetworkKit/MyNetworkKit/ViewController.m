@@ -20,9 +20,9 @@
     [super viewDidLoad];
     
 //    [Reachability rechableWithHostName:@"localhost"];
-//    Reachability * r1 = [Reachability reachableWithHostName:@"www.baidu.com"];//不要加http://
-    [Reachability reachabilityForLocalWiFi];
-//    Reachability * r2 = [Reachability reachableForInternet];
+    Reachability * r1 = [Reachability reachableWithHostName:@"www.baidu.com"];//不要加http://
+    Reachability * r2 = [Reachability reachabilityForLocalWiFi];
+    Reachability * r3 = [Reachability reachableForInternet];
 
 }
 
