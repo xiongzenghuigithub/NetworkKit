@@ -15,14 +15,22 @@
 #import <netdb.h>
 
 
+
+NSString * const kReachabilityChangedNotification = @"kReachabilityChangedNotification";
+
+
 /** 隐藏类 */
 @interface Reachability ()
 
 
 #if NEEDS_DISPATCH_RETAIN_RELEASE == 1  //非ARC环境
-    @property (nonatomic, assign) dispatch_queue_t reachabilitySerialQueue; //保存要监听的网络连接(SCNetworkReachabilityRef) 队列
+    @property (nonatomic, assign) dispatch_queue_t reachabilitySerialQueue;       //保存要监听的网络连接(SCNetworkReachabilityRef)串行队列
+
+    @property (nonatomic, assign) dispatch_group_t group;
 #else
     @property (nonatomic, strong) dispatch_queue_t reachabilitySerialQueue;
+
+    @property (nonatomic, strong) dispatch_group_t group;
 #endif
 
 @property (nonatomic, strong) id reachabilityObject;
@@ -44,7 +52,6 @@ static void convertNSStringIP(struct sockaddr_in * addr, NSString * ip) {
     }
     bzero(&(addr->sin_zero), 8);
     
-    //不适用端口
 }
 
 
@@ -224,8 +231,40 @@ static void PrintReachabilityFlags(SCNetworkReachabilityFlags flags, const char*
 //TODO: 接受网络状态变化的回调处理函数
 static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info) {
     
+    //接收到状态修改的SCNetworkReachabilityRef链接引用，封装在 Reachability对象的reachabilityRef属性中
+#pragma unused(target)
+    Reachability * reachabilty = (__bridge Reachability *)info;//使用 __bridge 将 C语言中得 void * 转换成 OC中得指针类型
+    
+    @autoreleasepool {
+        
+        [reachabilty reachabilityChanged:flags];
+    }
 }
 
+- (void)reachabilityChanged:(SCNetworkConnectionFlags)flags {
+    
+    //1. 执行Block，值传递
+    if([self isReachableWithFlags:flags])
+    {
+        if(self.reachableBlock)
+        {
+            self.reachableBlock(self);
+        }
+    }
+    else
+    {
+        if(self.notReachableBlock)
+        {
+            self.notReachableBlock(self);
+        }
+    }
+    
+    //2. 
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:kReachabilityChangedNotification object:self];
+    });
+}
 
 -(BOOL)startNotifier {
     
@@ -239,9 +278,8 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
     context.info = (__bridge void *)self;//__bridge把void*转换为id类型
     
     //2. 创建保存要监听的网络连接的队列
-    self.reachabilitySerialQueue = dispatch_queue_create("com.xzh.network.reachabilityQueue", NULL);//创建串行队列
     if (self.reachabilitySerialQueue == nil) {
-        return NO;
+        self.reachabilitySerialQueue = dispatch_queue_create("com.xzh.network.reachabilityQueue", NULL);//创建串行队列
     }
     
     //3. 设置 接收到监听的网络连接的 网络状态发送变化后，回调context指定的 指定对象的指定函数
@@ -279,7 +317,7 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
 #endif
     }
     
-    //5. 所有操作成功执行完毕后，要对self.reachabilityObject进行release一次，上面只在失败的时候进行release，保持平衡
+    //5. 所有操作成功执行完毕后，要对self.reachabilityObject进行release一次 --> 让当前指向对象的指针清空，让对象减少被引用的指针数
     self.reachabilityObject = nil;
     
     return YES;//成功开启网络状态监听
@@ -320,6 +358,10 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
 #if !(__has_feature(objc_arc))
     [super dealloc];
 #endif
+}
+
+- (void)test {
+    NSLog(@"Reachability - test");
 }
 
 @end

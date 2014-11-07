@@ -11,6 +11,10 @@
 
 @class Reachability;
 
+//TODO: extern 声明全局变量
+extern NSString * const kReachabilityChangedNotification;
+
+
 //TODO: 1)iOS设备类型判断  2)iOS系统版本判断
 #if TARGET_OS_IPHONE 
     #if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
@@ -19,6 +23,7 @@
         #define NEEDS_DISPATCH_RETAIN_RELEASE 1
     #endif
 #else
+    //mac os target
 #endif
 
 /** Network Status */
@@ -29,10 +34,13 @@ typedef enum {
 }NetworkStatus;
 
 /** 回传Reachbility对象 */
-typedef void (^NetworkRechable)(Reachability * rechability);
-typedef void (^NetworkUnRechable)(Reachability * rechability);
+typedef void (^ReachableBlock)(Reachability * rechability);
+typedef void (^UnReachableBlock)(Reachability * rechability);
 
 @interface Reachability : NSObject
+
+@property (nonatomic, copy) ReachableBlock reachableBlock;
+@property (nonatomic, copy) UnReachableBlock notReachableBlock;
 
 /** 当前到达主机的类型 */
 @property (nonatomic, assign) NetworkStatus currentReachableStatus;
@@ -62,10 +70,10 @@ typedef void (^NetworkUnRechable)(Reachability * rechability);
 - (BOOL)isReachableViaWWAN;
 - (BOOL)isReachableViaWiFi;
 
-/** 开起监听手机网络状态 */
+/** 开起监听手机网络状态 （需要先得到一个网络连接 --> Reachability对象 --> SCNetworkReachabilityRef网络连接的引用）*/
 -(BOOL)startNotifier;
 
-/** 停止监听手机网络状态 */
+/** 停止监听手机网络状态 (对当前Reachability对象保存的SCNetworkReachabilityRef网络连接引用进行关闭) */
 -(void)stopNotifier;
 
 /** 是否需要建立连接 */
@@ -75,6 +83,9 @@ typedef void (^NetworkUnRechable)(Reachability * rechability);
 /** 获取当前网络连接状态 */
 - (NetworkStatus)currentReachabilityStatus;
 
-static void convertNSStringIP(struct sockaddr_in * addr, NSString * ip);
+/** 创建一个并行队列 ， 指定并发数 */
+void createConcurrentQueue(const char * queueName, int queueSize, dispatch_group_t * group, dispatch_queue_t * queue);
+
+- (void)test;
 
 @end

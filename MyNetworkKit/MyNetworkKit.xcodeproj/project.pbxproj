@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		94F24A421A0B19230044158C /* MyOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 94F24A411A0B19230044158C /* MyOperation.m */; };
 		94F60C741A088A03001D62E3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F60C731A088A03001D62E3 /* Foundation.framework */; };
 		94F60C761A088A04001D62E3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F60C751A088A04001D62E3 /* CoreGraphics.framework */; };
 		94F60C781A088A04001D62E3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F60C771A088A04001D62E3 /* UIKit.framework */; };
@@ -25,6 +26,10 @@
 		94F60CB11A088C68001D62E3 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F60CB01A088C68001D62E3 /* CFNetwork.framework */; };
 		94F60CB31A088C6E001D62E3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F60CB21A088C6E001D62E3 /* Security.framework */; };
 		94F60CB51A088C82001D62E3 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F60CB41A088C82001D62E3 /* SystemConfiguration.framework */; };
+		94FAC4401A0CAC84007CFC58 /* NSString+MyNetworkKitExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 94FAC43F1A0CAC84007CFC58 /* NSString+MyNetworkKitExtension.m */; };
+		94FAC4431A0CC429007CFC58 /* UIImage+MyNetworkKitExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 94FAC4421A0CC429007CFC58 /* UIImage+MyNetworkKitExtension.m */; };
+		94FAC4451A0CC737007CFC58 /* test.png in Resources */ = {isa = PBXBuildFile; fileRef = 94FAC4441A0CC737007CFC58 /* test.png */; };
+		94FAC4481A0CCB21007CFC58 /* UIImageView+MyNetworkKitExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 94FAC4471A0CCB21007CFC58 /* UIImageView+MyNetworkKitExtension.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +44,8 @@
 
 /* Begin PBXFileReference section */
 		94BCA8D51A08AA0000479BE9 /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
+		94F24A401A0B19230044158C /* MyOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyOperation.h; sourceTree = "<group>"; };
+		94F24A411A0B19230044158C /* MyOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyOperation.m; sourceTree = "<group>"; };
 		94F60C701A088A03001D62E3 /* MyNetworkKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyNetworkKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		94F60C731A088A03001D62E3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		94F60C751A088A04001D62E3 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -63,6 +70,13 @@
 		94F60CB01A088C68001D62E3 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		94F60CB21A088C6E001D62E3 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		94F60CB41A088C82001D62E3 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		94FAC43E1A0CAC84007CFC58 /* NSString+MyNetworkKitExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+MyNetworkKitExtension.h"; sourceTree = "<group>"; };
+		94FAC43F1A0CAC84007CFC58 /* NSString+MyNetworkKitExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+MyNetworkKitExtension.m"; sourceTree = "<group>"; };
+		94FAC4411A0CC429007CFC58 /* UIImage+MyNetworkKitExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+MyNetworkKitExtension.h"; sourceTree = "<group>"; };
+		94FAC4421A0CC429007CFC58 /* UIImage+MyNetworkKitExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+MyNetworkKitExtension.m"; sourceTree = "<group>"; };
+		94FAC4441A0CC737007CFC58 /* test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = test.png; sourceTree = "<group>"; };
+		94FAC4461A0CCB21007CFC58 /* UIImageView+MyNetworkKitExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+MyNetworkKitExtension.h"; sourceTree = "<group>"; };
+		94FAC4471A0CCB21007CFC58 /* UIImageView+MyNetworkKitExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+MyNetworkKitExtension.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +109,8 @@
 		94F60C671A088A03001D62E3 = {
 			isa = PBXGroup;
 			children = (
+				94F24A401A0B19230044158C /* MyOperation.h */,
+				94F24A411A0B19230044158C /* MyOperation.m */,
 				94F60C791A088A04001D62E3 /* MyNetworkKit */,
 				94F60C981A088A04001D62E3 /* MyNetworkKitTests */,
 				94F60C721A088A03001D62E3 /* Frameworks */,
@@ -128,6 +144,7 @@
 		94F60C791A088A04001D62E3 /* MyNetworkKit */ = {
 			isa = PBXGroup;
 			children = (
+				94FAC4441A0CC737007CFC58 /* test.png */,
 				94F60CA81A088A22001D62E3 /* Lib */,
 				94F60C821A088A04001D62E3 /* AppDelegate.h */,
 				94F60C831A088A04001D62E3 /* AppDelegate.m */,
@@ -172,6 +189,7 @@
 		94F60CA81A088A22001D62E3 /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				94FAC43D1A0CAC4F007CFC58 /* Categories */,
 				94F60CA91A088A3B001D62E3 /* Reachability */,
 				94BCA8D51A08AA0000479BE9 /* Config.h */,
 			);
@@ -185,6 +203,19 @@
 				94F60CAE1A088B91001D62E3 /* Reachability.m */,
 			);
 			name = Reachability;
+			sourceTree = "<group>";
+		};
+		94FAC43D1A0CAC4F007CFC58 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				94FAC43E1A0CAC84007CFC58 /* NSString+MyNetworkKitExtension.h */,
+				94FAC43F1A0CAC84007CFC58 /* NSString+MyNetworkKitExtension.m */,
+				94FAC4411A0CC429007CFC58 /* UIImage+MyNetworkKitExtension.h */,
+				94FAC4421A0CC429007CFC58 /* UIImage+MyNetworkKitExtension.m */,
+				94FAC4461A0CCB21007CFC58 /* UIImageView+MyNetworkKitExtension.h */,
+				94FAC4471A0CCB21007CFC58 /* UIImageView+MyNetworkKitExtension.m */,
+			);
+			name = Categories;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -263,6 +294,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				94FAC4451A0CC737007CFC58 /* test.png in Resources */,
 				94F60C8C1A088A04001D62E3 /* Images.xcassets in Resources */,
 				94F60C7E1A088A04001D62E3 /* InfoPlist.strings in Resources */,
 				94F60C871A088A04001D62E3 /* Main.storyboard in Resources */,
@@ -285,8 +317,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				94F60C8A1A088A04001D62E3 /* ViewController.m in Sources */,
+				94FAC4431A0CC429007CFC58 /* UIImage+MyNetworkKitExtension.m in Sources */,
 				94F60C841A088A04001D62E3 /* AppDelegate.m in Sources */,
+				94FAC4401A0CAC84007CFC58 /* NSString+MyNetworkKitExtension.m in Sources */,
+				94FAC4481A0CCB21007CFC58 /* UIImageView+MyNetworkKitExtension.m in Sources */,
 				94F60CAF1A088B91001D62E3 /* Reachability.m in Sources */,
+				94F24A421A0B19230044158C /* MyOperation.m in Sources */,
 				94F60C801A088A04001D62E3 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
