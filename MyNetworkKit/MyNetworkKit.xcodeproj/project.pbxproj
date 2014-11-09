@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		218667AA1A0DEFFC00340FEF /* NSDictionary+RequestEncode.m in Sources */ = {isa = PBXBuildFile; fileRef = 218667A91A0DEFFC00340FEF /* NSDictionary+RequestEncode.m */; };
+		218667AF1A0DF7B200340FEF /* NSData+MKBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = 218667AC1A0DF7B200340FEF /* NSData+MKBase64.m */; };
+		218667B01A0DF7B200340FEF /* NSDate+RFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = 218667AE1A0DF7B200340FEF /* NSDate+RFC1123.m */; };
+		218667B31A0DFAC000340FEF /* NetworkEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 218667B21A0DFAC000340FEF /* NetworkEngine.m */; };
+		218667B61A0DFAD500340FEF /* NetworkOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 218667B51A0DFAD500340FEF /* NetworkOperation.m */; };
 		94F24A421A0B19230044158C /* MyOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 94F24A411A0B19230044158C /* MyOperation.m */; };
 		94F60C741A088A03001D62E3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F60C731A088A03001D62E3 /* Foundation.framework */; };
 		94F60C761A088A04001D62E3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F60C751A088A04001D62E3 /* CoreGraphics.framework */; };
@@ -43,9 +48,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		94BCA8D51A08AA0000479BE9 /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
-		94F24A401A0B19230044158C /* MyOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyOperation.h; sourceTree = "<group>"; };
-		94F24A411A0B19230044158C /* MyOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyOperation.m; sourceTree = "<group>"; };
+		218667A81A0DEFFC00340FEF /* NSDictionary+RequestEncode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+RequestEncode.h"; sourceTree = "<group>"; };
+		218667A91A0DEFFC00340FEF /* NSDictionary+RequestEncode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+RequestEncode.m"; sourceTree = "<group>"; };
+		218667AB1A0DF7B200340FEF /* NSData+MKBase64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+MKBase64.h"; sourceTree = "<group>"; };
+		218667AC1A0DF7B200340FEF /* NSData+MKBase64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+MKBase64.m"; sourceTree = "<group>"; };
+		218667AD1A0DF7B200340FEF /* NSDate+RFC1123.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+RFC1123.h"; sourceTree = "<group>"; };
+		218667AE1A0DF7B200340FEF /* NSDate+RFC1123.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+RFC1123.m"; sourceTree = "<group>"; };
+		218667B11A0DFAC000340FEF /* NetworkEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkEngine.h; sourceTree = "<group>"; };
+		218667B21A0DFAC000340FEF /* NetworkEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkEngine.m; sourceTree = "<group>"; };
+		218667B41A0DFAD500340FEF /* NetworkOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkOperation.h; sourceTree = "<group>"; };
+		218667B51A0DFAD500340FEF /* NetworkOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkOperation.m; sourceTree = "<group>"; };
+		94BCA8D51A08AA0000479BE9 /* MyNetworkKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyNetworkKit.h; sourceTree = "<group>"; };
+		94F24A401A0B19230044158C /* MyOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MyOperation.h; path = ../MyOperation.h; sourceTree = "<group>"; };
+		94F24A411A0B19230044158C /* MyOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MyOperation.m; path = ../MyOperation.m; sourceTree = "<group>"; };
 		94F60C701A088A03001D62E3 /* MyNetworkKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyNetworkKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		94F60C731A088A03001D62E3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		94F60C751A088A04001D62E3 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -109,8 +124,6 @@
 		94F60C671A088A03001D62E3 = {
 			isa = PBXGroup;
 			children = (
-				94F24A401A0B19230044158C /* MyOperation.h */,
-				94F24A411A0B19230044158C /* MyOperation.m */,
 				94F60C791A088A04001D62E3 /* MyNetworkKit */,
 				94F60C981A088A04001D62E3 /* MyNetworkKitTests */,
 				94F60C721A088A03001D62E3 /* Frameworks */,
@@ -151,6 +164,8 @@
 				94F60C851A088A04001D62E3 /* Main.storyboard */,
 				94F60C881A088A04001D62E3 /* ViewController.h */,
 				94F60C891A088A04001D62E3 /* ViewController.m */,
+				94F24A401A0B19230044158C /* MyOperation.h */,
+				94F24A411A0B19230044158C /* MyOperation.m */,
 				94F60C8B1A088A04001D62E3 /* Images.xcassets */,
 				94F60C7A1A088A04001D62E3 /* Supporting Files */,
 			);
@@ -191,7 +206,11 @@
 			children = (
 				94FAC43D1A0CAC4F007CFC58 /* Categories */,
 				94F60CA91A088A3B001D62E3 /* Reachability */,
-				94BCA8D51A08AA0000479BE9 /* Config.h */,
+				94BCA8D51A08AA0000479BE9 /* MyNetworkKit.h */,
+				218667B11A0DFAC000340FEF /* NetworkEngine.h */,
+				218667B21A0DFAC000340FEF /* NetworkEngine.m */,
+				218667B41A0DFAD500340FEF /* NetworkOperation.h */,
+				218667B51A0DFAD500340FEF /* NetworkOperation.m */,
 			);
 			path = Lib;
 			sourceTree = "<group>";
@@ -208,12 +227,18 @@
 		94FAC43D1A0CAC4F007CFC58 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				218667AB1A0DF7B200340FEF /* NSData+MKBase64.h */,
+				218667AC1A0DF7B200340FEF /* NSData+MKBase64.m */,
+				218667AD1A0DF7B200340FEF /* NSDate+RFC1123.h */,
+				218667AE1A0DF7B200340FEF /* NSDate+RFC1123.m */,
 				94FAC43E1A0CAC84007CFC58 /* NSString+MyNetworkKitExtension.h */,
 				94FAC43F1A0CAC84007CFC58 /* NSString+MyNetworkKitExtension.m */,
 				94FAC4411A0CC429007CFC58 /* UIImage+MyNetworkKitExtension.h */,
 				94FAC4421A0CC429007CFC58 /* UIImage+MyNetworkKitExtension.m */,
 				94FAC4461A0CCB21007CFC58 /* UIImageView+MyNetworkKitExtension.h */,
 				94FAC4471A0CCB21007CFC58 /* UIImageView+MyNetworkKitExtension.m */,
+				218667A81A0DEFFC00340FEF /* NSDictionary+RequestEncode.h */,
+				218667A91A0DEFFC00340FEF /* NSDictionary+RequestEncode.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -319,9 +344,14 @@
 				94F60C8A1A088A04001D62E3 /* ViewController.m in Sources */,
 				94FAC4431A0CC429007CFC58 /* UIImage+MyNetworkKitExtension.m in Sources */,
 				94F60C841A088A04001D62E3 /* AppDelegate.m in Sources */,
+				218667AA1A0DEFFC00340FEF /* NSDictionary+RequestEncode.m in Sources */,
+				218667B61A0DFAD500340FEF /* NetworkOperation.m in Sources */,
 				94FAC4401A0CAC84007CFC58 /* NSString+MyNetworkKitExtension.m in Sources */,
 				94FAC4481A0CCB21007CFC58 /* UIImageView+MyNetworkKitExtension.m in Sources */,
+				218667B31A0DFAC000340FEF /* NetworkEngine.m in Sources */,
+				218667B01A0DF7B200340FEF /* NSDate+RFC1123.m in Sources */,
 				94F60CAF1A088B91001D62E3 /* Reachability.m in Sources */,
+				218667AF1A0DF7B200340FEF /* NSData+MKBase64.m in Sources */,
 				94F24A421A0B19230044158C /* MyOperation.m in Sources */,
 				94F60C801A088A04001D62E3 /* main.m in Sources */,
 			);

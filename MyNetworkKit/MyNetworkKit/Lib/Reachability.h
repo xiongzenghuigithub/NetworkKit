@@ -14,18 +14,6 @@
 //TODO: extern 声明全局变量
 extern NSString * const kReachabilityChangedNotification;
 
-
-//TODO: 1)iOS设备类型判断  2)iOS系统版本判断
-#if TARGET_OS_IPHONE 
-    #if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
-        #define NEEDS_DISPATCH_RETAIN_RELEASE 0
-    #else
-        #define NEEDS_DISPATCH_RETAIN_RELEASE 1
-    #endif
-#else
-    //mac os target
-#endif
-
 /** Network Status */
 typedef enum {
     NotReachible = 0,           // 网络请求不可到达
@@ -42,8 +30,6 @@ typedef void (^UnReachableBlock)(Reachability * rechability);
 @property (nonatomic, copy) ReachableBlock reachableBlock;
 @property (nonatomic, copy) UnReachableBlock notReachableBlock;
 
-/** 当前到达主机的类型 */
-@property (nonatomic, assign) NetworkStatus currentReachableStatus;
 
 /** 与测试主机的连接对象的引用 */
 @property (nonatomic, assign) SCNetworkReachabilityRef reachabilityRef;
@@ -61,9 +47,6 @@ typedef void (^UnReachableBlock)(Reachability * rechability);
 
 /** 检查网络请求是否可到达指定的，获得对IP地址的连接引用 - ip地址 */
 + (Reachability *)reachableWithIPAddress:(const struct sockaddr_in *)addr;
-
-/** 根据检查到得到达主机情况创建Rechability对象  */
-+ (Reachability *)getReachableIntsanceWithReachaRef:(SCNetworkReachabilityRef)reachaRef;
 
 //获取当前Reachability的到达结果(由链接引用获取)
 - (BOOL)isReachable;

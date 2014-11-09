@@ -11,7 +11,7 @@
 
 @implementation NSString (MyNetworkKitExtension)
 
-+ (NSString *) uniqueString {
++ (NSString *) my_uniqueString {
     
     CFUUIDRef	uuidObj = CFUUIDCreate(nil);
 	NSString	*uuidString = (__bridge_transfer NSString*)CFUUIDCreateString(nil, uuidObj);
@@ -19,7 +19,7 @@
 	return uuidString;
 }
 
-- (NSString *)md5 {
+- (NSString *) my_md5 {
     const char *cStr = [self UTF8String];
     unsigned char result[16];
     CC_MD5( cStr, (unsigned int) strlen(cStr), result);
@@ -58,6 +58,38 @@
     return (!decodedString) ? @"" : [decodedString stringByReplacingOccurrencesOfString:@"+" withString:@" "];
 
 }
+
++ (NSString *) my_mainBundlePath:(NSString *)fileName {
+    return [[NSBundle mainBundle] pathForResource:fileName ofType:nil];
+}
+
++ (NSString *) getHomePath {
+    return NSHomeDirectory();
+}
+
++ (NSString *) getDocumentsPath {
+    return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+}
+
++ (NSString *) getCachesPath {
+    return [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+}
+
++ (NSString *) getTmpPath {
+    return NSTemporaryDirectory();
+}
+
++ (NSString *) getMainBundleName {
+    return [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString *)kCFBundleNameKey];
+}
+
+
++ (NSString *) getVersionForMainBundle {
+    return [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString *)kCFBundleVersionKey];
+}
+
+
+
 
 
 @end

@@ -35,6 +35,9 @@ NSString * const kReachabilityChangedNotification = @"kReachabilityChangedNotifi
 
 @property (nonatomic, strong) id reachabilityObject;
 
+/** 根据检查到得到达主机情况创建Rechability对象  */
++ (Reachability *)getReachableIntsanceWithReachaRef:(SCNetworkReachabilityRef)reachaRef;
+
 @end
 
 
@@ -149,9 +152,11 @@ static void PrintReachabilityFlags(SCNetworkReachabilityFlags flags, const char*
 }
 
 - (BOOL)isReachable {
+    
     SCNetworkConnectionFlags flags = 0;
-    //获取链接状态，是否可到达
-    if(!SCNetworkReachabilityGetFlags(self.reachabilityRef, &flags)) {
+    
+    //判断网络连接是否可到达
+    if(SCNetworkReachabilityGetFlags(self.reachabilityRef, &flags) == false) {
         return NO;
     }
     return [self isReachableWithFlags:flags];
@@ -268,13 +273,9 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
 
 -(BOOL)startNotifier {
     
-    //1. context指定异步监听网络连接回调时 ，调用哪个对象(需要retain一次) ，哪个方法(必须是c语言函数)
-    SCNetworkReachabilityContext  context = { 0, NULL, NULL, NULL, NULL };
-    
-    //需要对当前Reachability对象retain一次 ==> 加一个强指针引用, 方法执行完毕后一定要清空这个强引用（进行release一次）
     self.reachabilityObject = self;
     
-    //TODO:  使用 __bridge 关键字来实现 id类型 与 void* 类型的相互转换
+    SCNetworkReachabilityContext  context = { 0, NULL, NULL, NULL, NULL };
     context.info = (__bridge void *)self;//__bridge把void*转换为id类型
     
     //2. 创建保存要监听的网络连接的队列
@@ -288,28 +289,23 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
 #ifdef DEBUG
         NSLog(@"SCNetworkReachabilitySetCallback() failed: %s", SCErrorString(SCError()));
 #endif
-        //设置监听回调函数失败
         
-        //3.1 release一次队列(因为SCNetworkReachabilitySetCallback里面会进行retain操作)
+        //release
 #if NEEDS_DISPATCH_RETAIN_RELEASE == 1 //非ARC
         dispatch_release(self.reachabilitySerialQueue); //非ARC下 ，release释放
 #else
         self.reachabilitySerialQueue = nil;             //ARC ，指针为nil
 #endif
-        //3.2 release一次self.reachabilityObject(因为SCNetworkReachabilitySetCallback里面会进行retain操作)
+        //release之间retain过的
         self.reachabilityObject = nil;                  //减少强引用一次
         
         return NO;
     }
     
     //4. 开启网络监听 1)监听哪一个网络连接  2)先暂时保存在队列（因为都是异步等待到某一个时刻才真正发起网络监听）
-    if (SCNetworkReachabilitySetDispatchQueue(self.reachabilityRef, self.reachabilitySerialQueue) == false) {//发起监听失败
+    if (SCNetworkReachabilitySetDispatchQueue(self.reachabilityRef, self.reachabilitySerialQueue) == false) {
+        //发起监听失败
         
-        //注: SCNetworkReachabilitySetDispatchQueue()方法内部会对传入的参数进行retain，所以改方法执行完毕，需要对传入的参数进行release
-        
-        //开启监听失败
-        
-        //对传入的参数进都release一次，保持计数器平衡
 #if NEEDS_DISPATCH_RETAIN_RELEASE == 1
         dispatch_release(self.reachabilitySerialQueue);
 #else
@@ -365,3 +361,27 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
 }
 
 @end
+
+/*
+    判断客户端 与所给 域名或IP地址 是否可达 -- SystemConfiguration库
+    
+    1.  获取网络连接 SCNetworkReachabilityRef
+        
+        //1.1 测试连接到域名: www.baidu.com
+        SCNetworkReachabilityRef ref = SCNetworkReachabilityCreateWithName(NULL , [NSString的域名 UTF8String])
+ 
+        //1.2 测试连接到域名: 192.189.2.1
+        SCNetworkReachabilityRef ref = SCNetworkReachabilityCreateWithAddress(kCFAllocatorDefault, (const struct sockaddr *)addr);
+ 
+    2. 根据 网络连接 SCNetworkReachabilityRef 得到可达状态SCNetworkReachabilityFlags
+            
+        SCNetworkReachabilityFlags flags = 0;
+        if (SCNetworkReachabilityGetFlags(得到的网络连接 , &flags) == false) {
+            //不可达
+        }
+        else {
+            //可达
+                > 通过3G网络可达
+                > 通过WiFi网络可达
+        }
+ */
