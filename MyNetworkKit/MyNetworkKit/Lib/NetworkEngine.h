@@ -9,17 +9,24 @@
 #import <Foundation/Foundation.h>
 @class NetworkOperation;
 
+/**
+ *  http 请求的方法
+ */
 typedef enum {
     GET = 0,
     POST
 }HttpReqMethod;
 
+/**
+ *  NetworkOperation的状态
+ */
 typedef enum {
     NetworkOperationStateReady = 1,
     NetworkOperationStateExecuting = 2,
     NetworkOperationStateFinished = 3,
 }NetworkOperationState;
 
+typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
 
 /*!
  *  一个 NetworkEngine 封装一个主机域名下的所有http请求
@@ -31,6 +38,7 @@ typedef enum {
 @property (nonatomic, copy) NSString * hostName;
 @property (nonatomic, strong) NSDictionary * headersDict;
 @property (nonatomic, assign) int port;
+@property (nonatomic, copy)ReachabulityChangedStatus reachabulityChangedStatus;
 
 //-------------------------------创建 Engine 对象-------------------------------------
 /*  
