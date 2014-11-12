@@ -7,13 +7,15 @@
 //
 
 #import "NetworkEngine.h"
+
 #import "MyNetworkKit.h"
+#import "NetworkOperation.h"
 
 @interface NetworkEngine ()
 
 @property (nonatomic, strong) Reachability * reachability;              //与主机的连接引用
 @property (nonatomic, assign) BOOL shouldSendAcceptLanguageHeader;      //本地语言化
-@property (nonatomic, assign) Class customOperationSubclass;            //注册NetworkOperation的子类为使用的operation类
+@property (nonatomic, assign) Class customOperationSubclass;            //注册自定义继承自NetworkOperation的子类为使用的operation类
 
 #if NEEDS_DISPATCH_RETAIN_RELEASE 
 @property (nonatomic, assign) dispatch_queue_t backgroudQueue;
@@ -31,7 +33,7 @@ static NSOperationQueue * _sharedNetworkQueue;
 
 @implementation NetworkEngine
 
-
+//TODO: initialize 1)初始化队列  2)给队列注册KVO观察者
 +(void)initialize {
     if (!_sharedNetworkQueue) {
         static dispatch_once_t oncePredicate;
@@ -52,6 +54,7 @@ static NSOperationQueue * _sharedNetworkQueue;
     
 }
 
+
 - (id)init {
     return [self initWithHostName:nil];
 }
@@ -64,6 +67,7 @@ static NSOperationQueue * _sharedNetworkQueue;
     return [self initWithHostName:hostName Port:0 CustomHeaderFileds:headersDict];
 }
 
+//TODO: 所有的 initWithHostName函数 都在这个函数处理
 - (id)initWithHostName:(NSString *)hostName Port:(int)port CustomHeaderFileds:(NSDictionary *)headersDict {
     
     /**
@@ -78,14 +82,14 @@ static NSOperationQueue * _sharedNetworkQueue;
      *                  4.2 调用Reachability类对自己持有的与主机网络连接引用 进行异步监听状态变化
      *          5. 补充请求头的 request.header["User-Agent"]
      *          6. 默认设置
-     *                  6.1 指定当前Engine使用的operation的类型
+     *                  6.1 * 指定当前Engine使用的operation的类型 (如果不手动设置，默认为NetworkOperation基类类型)
      *                  6.2 默认使用语言国际化
      */
     
     //1. 调用 [super init]
     if ((self = [super init]) == nil) {
         
-        self.port = port;
+        self.port = port;      //保存服务器端口
         
         //2. 创建队列
         self.backgroudQueue = dispatch_queue_create("com.cn.xzn.backgroudQueue", NULL);
@@ -96,9 +100,9 @@ static NSOperationQueue * _sharedNetworkQueue;
             
             self.hostName = hostName;
             
-            //1) 注册与主机连接的状态变化的通知
+            //1) 注册与主机连接的状态变化的通知 , 等待接收到Reachability对象完成对HostName网络连接状态变化监听的结果
             [[NSNotificationCenter defaultCenter] addObserver:self
-                                                     selector:@selector(didReceiveReachabilityWithHostStatusChanged:) name:kReachabilityChangedNotification
+                                                     selector:@selector(didReceiveReachabilityWithHostStatusChanged:) name:kReachabilityChangedNotification         //通知key 定义在 Reachability中
                                                        object:nil];
             
             //2) 获取与指定主机名的连接引用: SCNetworkReachabilityRef
@@ -121,7 +125,7 @@ static NSOperationQueue * _sharedNetworkQueue;
         if (headersDict[@"User-Agent"] == nil) {//没有设置User-Agant , 框架补上
             
             //将用户传入的字典拷贝为一个可变的字典
-            NSMutableDictionary * copyDict = [headersDict mutableCopy];//使用mutableCopy
+            NSMutableDictionary * copyDict = [headersDict mutableCopy];     //使用mutableCopy拷贝出一个新的、可变的字典
             
             //让可变字典添加 User-Agent字段
             NSString * userAgantValue = [NSString stringWithFormat:@"%@/%@",
@@ -144,6 +148,7 @@ static NSOperationQueue * _sharedNetworkQueue;
     return self;
 }
 
+//TODO: 内存释放掉持有的对象
 - (void)dealloc {
     
     //释放的队列
@@ -175,7 +180,7 @@ static NSOperationQueue * _sharedNetworkQueue;
 }
 
 
-#pragma mark - 接受到网络连接改变的通知
+//TODO: 接受到网络连接改变的通知
 - (void)didReceiveReachabilityWithHostStatusChanged:(NSNotification *)notify {
     if ([self.reachability isReachable] == YES) {
         
@@ -198,13 +203,114 @@ static NSOperationQueue * _sharedNetworkQueue;
 
 
 
+//TODO: 只指定子路径API路径的init函数层次
+- (NetworkOperation *)operationWithApiPath:(NSString *) apiPath {
+    return [self operationWithApiPath:apiPath ParamsDict:nil]; //默认是GET
+}
+
+- (NetworkOperation *)operationWithApiPath:(NSString *)apiPath
+                                ParamsDict:(NSDictionary *)dict {
+    
+    return [self operationWithApiPath:apiPath ParamsDict:dict HttpReqMethod:@"get"];   //默认是GET
+}
+
+- (NetworkOperation *)operationWithApiPath:(NSString *)apiPath
+                                ParamsDict:(NSDictionary *)dict
+                             HttpReqMethod:(NSString *)method {
+    
+    return [self operationWithApiPath:apiPath ParamsDict:dict HttpReqMethod:method IsSSL:NO]; //默认不使用https
+}
+
+- (NetworkOperation *)operationWithApiPath:(NSString *)apiPath
+                                ParamsDict:(NSDictionary *)dict
+                             HttpReqMethod:(NSString *)method
+                                     IsSSL:(BOOL)ssl {
+    
+    //1. Engine对象没有持有hostName
+    if ([self hostName] == nil || [[[self hostName] stringByReplacingOccurrencesOfString:@" " withString:@""] isEqualToString:@""]) {
+        NSLog(@"创建Engine对象时，必须指定这个Engine的root主机域名!");
+        return nil;
+    }
+    
+    //2. 完成拼接除开参数的完整 api请求URL
+    NSMutableString * fullApiPath = [NSMutableString string];
+    NSString * api = @"";
+    
+    //去掉API路径包含的 "/"
+    if ([apiPath hasPrefix:@"/"]) {
+        api = [apiPath substringFromIndex:1];
+    }
+    
+    //确定使用http or https
+    [fullApiPath appendString:((ssl) ? @"https://" : @"http://")];
+    
+    //URL = http://www.baidu.com/news/search 或 https://www.baidu.com/news/search
+    [fullApiPath appendString:[NSString stringWithFormat:@"%@/%@", [self hostName] , api]];
+    
+    return [self operationWithCompletURLString:fullApiPath params:dict HttpMethod:method];
+}
+
+//TODO: 得到完整URL路径的init函数层次
+- (NetworkOperation *)operationWithCompletURLString:(NSString *)URLString
+                                             params:(NSDictionary *)dict
+                                         HttpMethod:(NSString *)method
+{
+    //1. 创建当前Engine 持有的operation类型 的对象
+    NetworkOperation * op = [[self.customOperationSubclass alloc] initWithURL:URLString ParamDict:dict ReqMethod:method];
+    
+    //2. 给operation添加请求头
+    [self prepareHeaders:op];
+    
+    //3. 是否多语言
+    op.shouldSendAcceptLanguageHeader = self.shouldSendAcceptLanguageHeader;
+    
+    return op;
+}
 
 
 
+- (void)setCustomOperationSubclass:(Class)cls {
+    self.customOperationSubclass = cls;
+}
 
 
+-(void) prepareHeaders:(NetworkOperation *) operation {
+    operation.customHeader = self.headersDict;
+}
 
+//TODO: 将operation放入队列
+- (void)enqueueOperation:(NetworkOperation *) operation {
+    [self enqueueOperation:operation forceReload:NO];
+}
 
+- (void) enqueueOperation:(NetworkOperation *) operation forceReload:(BOOL) forceReload {
+    
+    if (operation == nil)
+        return;
+    
+    __weak NetworkEngine * weakSelf = self;
+    
+    //1. 先放入全局并发队列
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        //2. 先设置如果有缓存数据时如何处理
+        [operation setCacheBlock:^(NetworkOperation *completCachedOpeation) {
+            
+        }];
+        
+        //3. 判断当前operation封装的请求是否有缓存数据
+        if ([operation isCached])
+        {
+            //有缓存
+        }
+        else
+        {
+            //无缓存
+        }
+        
+    });
+    
+}
 
 
 

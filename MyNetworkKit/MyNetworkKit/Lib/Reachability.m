@@ -264,7 +264,7 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
         }
     }
     
-    //2. 
+    //2. 异步的发送通知表示网络连接已经发送变化、把当前Reachability对象作为通知的参数值 ，发送到消息中心
     dispatch_async(dispatch_get_main_queue(), ^{
         
         [[NSNotificationCenter defaultCenter] postNotificationName:kReachabilityChangedNotification object:self];

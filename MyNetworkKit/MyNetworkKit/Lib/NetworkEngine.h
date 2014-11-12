@@ -10,14 +10,6 @@
 @class NetworkOperation;
 
 /**
- *  http 请求的方法
- */
-typedef enum {
-    GET = 0,
-    POST
-}HttpReqMethod;
-
-/**
  *  NetworkOperation的状态
  */
 typedef enum {
@@ -99,14 +91,14 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
  */
 - (NetworkOperation *)operationWithApiPath:(NSString *) apiPath
                                 ParamsDict:(NSDictionary *) dict
-                             HttpReqMethod:(HttpReqMethod) method;
+                             HttpReqMethod:(NSString *) method;
 
 /**
  *  由Engine对象 创建 Operation对象 , 传入API的子路径(news/searchAll?name=zs&age=19) , 指定 GET或POST , 是否使用HTTPS
  */
 - (NetworkOperation *)operationWithApiPath:(NSString *) apiPath
                                 ParamsDict:(NSDictionary *) dict
-                             HttpReqMethod:(HttpReqMethod) method
+                             HttpReqMethod:(NSString *) method
                                      IsSSL:(BOOL) ssl;
 
 //----------------------------------直接指定完整URL访问的Operation---------------------------------
@@ -126,11 +118,11 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
  */
 - (NetworkOperation *)operationWithCompletURLString:(NSString *) URLString
                                              params:(NSDictionary *) dict
-                                         HttpMethod:(HttpReqMethod) method;
+                                         HttpMethod:(NSString *) method;
 
 
 /**
- *  给Operation设置请求头
+ *  给Operation添加请求头
  */
 -(void) prepareHeaders:(NetworkOperation *) operation;
 
@@ -175,6 +167,11 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
 - (void)enqueueOperation:(NetworkOperation *) operation;
 
 /**
+ *  将 NetOperation对象放入Engine对象的队列 , 异步等待执行 , 且不会返回缓存的数据
+ */
+- (void) enqueueOperation:(NetworkOperation *) operation forceReload:(BOOL) forceReload;
+
+/**
  *  取消执行包含指定URL的 NetOperation对象
  */
 - (void)cancelOperstionsContainingURLString:(NSString *) url;
@@ -203,5 +200,12 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
  *  清空缓存
  */
 - (void)emptyCache;
+
+/**
+ *  设置当前Engine所持有的Operation的类型Class
+ */
+- (void)setCustomOperationSubclass:(Class)cls;
+
+
 
 @end

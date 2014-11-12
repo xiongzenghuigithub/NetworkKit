@@ -1,10 +1,6 @@
-//
-//  MyOperation.h
-//  MyNetworkKit
-//
-//  Created by wadexiong on 14/11/6.
-//  Copyright (c) 2014年 xiong. All rights reserved.
-//
+/**
+ *  重写一个NSOperation子类的基本结构
+ */
 
 #import <Foundation/Foundation.h>
 

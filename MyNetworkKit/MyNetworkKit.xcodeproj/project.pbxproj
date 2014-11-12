@@ -13,6 +13,7 @@
 		218667B31A0DFAC000340FEF /* NetworkEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 218667B21A0DFAC000340FEF /* NetworkEngine.m */; };
 		218667B61A0DFAD500340FEF /* NetworkOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 218667B51A0DFAD500340FEF /* NetworkOperation.m */; };
 		94F24A421A0B19230044158C /* MyOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 94F24A411A0B19230044158C /* MyOperation.m */; };
+		94F54BDB1A130037001D3E86 /* ObserveRealationShip.m in Sources */ = {isa = PBXBuildFile; fileRef = 94F54BDA1A130037001D3E86 /* ObserveRealationShip.m */; };
 		94F60C741A088A03001D62E3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F60C731A088A03001D62E3 /* Foundation.framework */; };
 		94F60C761A088A04001D62E3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F60C751A088A04001D62E3 /* CoreGraphics.framework */; };
 		94F60C781A088A04001D62E3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F60C771A088A04001D62E3 /* UIKit.framework */; };
@@ -61,6 +62,8 @@
 		94BCA8D51A08AA0000479BE9 /* MyNetworkKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyNetworkKit.h; sourceTree = "<group>"; };
 		94F24A401A0B19230044158C /* MyOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MyOperation.h; path = ../MyOperation.h; sourceTree = "<group>"; };
 		94F24A411A0B19230044158C /* MyOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MyOperation.m; path = ../MyOperation.m; sourceTree = "<group>"; };
+		94F54BD91A130037001D3E86 /* ObserveRealationShip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObserveRealationShip.h; sourceTree = "<group>"; };
+		94F54BDA1A130037001D3E86 /* ObserveRealationShip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObserveRealationShip.m; sourceTree = "<group>"; };
 		94F60C701A088A03001D62E3 /* MyNetworkKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyNetworkKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		94F60C731A088A03001D62E3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		94F60C751A088A04001D62E3 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -121,6 +124,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		94F54BD81A13000E001D3E86 /* KVO */ = {
+			isa = PBXGroup;
+			children = (
+				94F54BD91A130037001D3E86 /* ObserveRealationShip.h */,
+				94F54BDA1A130037001D3E86 /* ObserveRealationShip.m */,
+			);
+			name = KVO;
+			sourceTree = "<group>";
+		};
 		94F60C671A088A03001D62E3 = {
 			isa = PBXGroup;
 			children = (
@@ -204,6 +216,7 @@
 		94F60CA81A088A22001D62E3 /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				94F54BD81A13000E001D3E86 /* KVO */,
 				94FAC43D1A0CAC4F007CFC58 /* Categories */,
 				94F60CA91A088A3B001D62E3 /* Reachability */,
 				94BCA8D51A08AA0000479BE9 /* MyNetworkKit.h */,
@@ -354,6 +367,7 @@
 				218667AF1A0DF7B200340FEF /* NSData+MKBase64.m in Sources */,
 				94F24A421A0B19230044158C /* MyOperation.m in Sources */,
 				94F60C801A088A04001D62E3 /* main.m in Sources */,
+				94F54BDB1A130037001D3E86 /* ObserveRealationShip.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -481,6 +495,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MyNetworkKit/MyNetworkKit-Prefix.pch";
 				INFOPLIST_FILE = "MyNetworkKit/MyNetworkKit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -494,6 +509,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MyNetworkKit/MyNetworkKit-Prefix.pch";
 				INFOPLIST_FILE = "MyNetworkKit/MyNetworkKit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

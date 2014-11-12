@@ -13,46 +13,53 @@
 #import "NetworkEngine.h"
 
 
-@interface ViewController ()
+@interface ViewController () {
+    NSString * _name;
+}
 
 @end
 
 @implementation ViewController
+
+- (NSString *)name {
+    return _name;
+}
+
+- (void)setName:(NSString *)name {
+    
+}
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
 
-    Reachability * r1 = [Reachability reachableWithHostName:@"www.baidu.com"];
+//    Reachability * r1 = [Reachability reachableWithHostName:@"www.baidu.com"];
+//    
+//    [r1 startNotifier];
+//    
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotifier:) name:kReachabilityChangedNotification object:nil];
     
-    [r1 startNotifier];
+    UIButton * btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn.frame = CGRectMake(20, 100, 100, 50);
+    [btn addTarget:self action:@selector(test) forControlEvents:UIControlEventTouchUpInside];
+    btn.backgroundColor = [UIColor redColor];
+    [self.view addSubview:btn];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotifier:) name:kReachabilityChangedNotification object:nil];
     
-    NSString * unique = [NSString my_uniqueString];
-    NSString * md5 = [@"xzh" my_md5];
-    UIImage * img = [UIImage createImageWithName:@"test.png"];
-    NSString * urlEncode = [@"www.我的hiohoop哈哈哈?id=他的.com" my_urlEncodedString];
-    NSLog(@"urlEncode = %@\n" ,urlEncode);
-    NSString * urlDecode = [urlEncode my_urlDecodedString];
-    NSLog(@"urlDecode = %@\n",urlDecode );
-    [NSString getTmpPath];
-    [NSString getCachesPath];
-    [NSString getHomePath];
-    [NSString getDocumentsPath];
     
-    NSDictionary * d = @{
-                         @"name":@"zhangsan",
-                         @"age":@"19",
-                         @"address":@"湖南"
-                         };
-    NSString * d_str = [d urlEncodedKeyValueString];
-    NSString * D_str2 = [d jsonEncodedKeyValueString];
-
+    NSString * url = @"http://dawdawdawdw";
     
-    NSString * bundleName = [NSString getMainBundleName];
-    NSString * version = [NSString getVersionForMainBundle];
+    NSString * api = @"";
+    if ([url hasPrefix:@"http://"]) {
+        api = [url substringFromIndex:6];
+    }else if ([url hasPrefix:@"https://"]){
+        api = [url substringFromIndex:7];
+    }
+    
+    
+    
+    
     
 }
 
@@ -62,10 +69,13 @@
     NSLog(@"notify = %@" , notify);
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+//    if (object == _name && [keyPath isEqualToString:@"name"]) {
+        NSLog(@"----------name变量值发生改变------------");
+//    }
 }
+
+    
+    
 
 @end
