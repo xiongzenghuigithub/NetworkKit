@@ -39,6 +39,7 @@
 #import "NSData+MKBase64.h"
 
 
+
 /** 框架的 通知 和 默认值 定义 */
 
 //1. 请求操作队列的设置
@@ -51,5 +52,6 @@
 #define kMyNetworkKitDefaultHeadRequestCacheDuration    3600*60*24                    //默认的head request缓存时间为一天
 #define kMyNetworkKitDefaultImageCacheDuration          3600*60*24                    //默认的图片缓存时间
 #define kMyNetworkKitDefaultRequestTimeOut              30                            //默认的请求超时为30秒
+#define kMyNetworkKitDefaultCacheSize                   10                            //默认缓存多少个respnse data
 
 #endif

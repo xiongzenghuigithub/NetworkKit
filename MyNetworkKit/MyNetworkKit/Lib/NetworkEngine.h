@@ -9,14 +9,8 @@
 #import <Foundation/Foundation.h>
 @class NetworkOperation;
 
-/**
- *  NetworkOperation的状态
- */
-typedef enum {
-    NetworkOperationStateReady = 1,
-    NetworkOperationStateExecuting = 2,
-    NetworkOperationStateFinished = 3,
-}NetworkOperationState;
+
+
 
 typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
 
@@ -32,6 +26,11 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
 @property (nonatomic, assign) int port;
 @property (nonatomic, copy)ReachabulityChangedStatus reachabulityChangedStatus;
 
+//TODO: 使用 可变字典 缓存 operation包含的response data
+@property (nonatomic, strong)NSMutableDictionary * memoryCacheDict; //指定存放response data的字典, 以operation.uniqueId为key存放
+
+
+//TODO: 创建 Engine 对象
 //-------------------------------创建 Engine 对象-------------------------------------
 /*  
  *  1. 一个Engine代表了 主机服务器下的根域名 , 所有子路径API请求 , 都是从Engine的根路径下开始.
@@ -57,6 +56,7 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
                   Port:(int) port;
 
 
+//TODO:  Engine对象 创建  Operation对象
 //---------------------------------创建 属于某个主机root域名下的Operation 对象-----------------------------------
 /**
  * 层级结构:
@@ -101,6 +101,8 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
                              HttpReqMethod:(NSString *) method
                                      IsSSL:(BOOL) ssl;
 
+
+//TODO: 完整URL访问的Operation
 //----------------------------------直接指定完整URL访问的Operation---------------------------------
 /**
  *  指定一个完整的URL创建Operation , 默认GET
@@ -127,6 +129,8 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
 -(void) prepareHeaders:(NetworkOperation *) operation;
 
 
+
+//TODO: 异步在Block中访问网络图片
 #if TARGET_OS_IPHONE
 
 /**
@@ -134,7 +138,7 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
  */
 - (void)imageWithURL:(NSURL *) imageURL
     FetchImageBlock:(void (^)(UIImage * image , NSURL * url , BOOL isInCache)) complet
-    DEPRECATED_ATTRIBUTE;
+    DEPRECATED_ATTRIBUTE;   //TODO: 使用宏 DEPRECATED_ATTRIBUTE 废弃使用某个方法
 
 /**
  *  访问网络图片 , 在Block中异步获取UIImage对象 , 并且是拉伸到指定大小的UIImage对象
@@ -167,7 +171,7 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
 - (void)enqueueOperation:(NetworkOperation *) operation;
 
 /**
- *  将 NetOperation对象放入Engine对象的队列 , 异步等待执行 , 且不会返回缓存的数据
+ *  将 NetOperation对象放入Engine对象的队列 , 异步等待执行 , 如果forceReload=YES-->及时有缓存也重新发起请求新数据
  */
 - (void) enqueueOperation:(NetworkOperation *) operation forceReload:(BOOL) forceReload;
 
@@ -187,7 +191,7 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
 -(NSString*) cacheDirectoryName;
 
 /**
- *  缓存目录的大小
+ *  在内存 - 能够缓存response data 的最大个数
  */
 - (int)cacheMemerySize;
 
@@ -206,6 +210,24 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
  */
 - (void)setCustomOperationSubclass:(Class)cls;
 
+/**
+ *  将当前operation(request对应的response数据)保存起来 --> 缓存相同的请求数据
+ */
+- (void)saveOperation:(NSData *)responseData forKey:(NSString *)key;
 
+/**
+ *  获取operation中包含的response data
+ */
+- (NSData *)cachedResponseWithOperation:(NetworkOperation *)operation;
+
+/**
+ *  是否已经开启使用缓存功能
+ */
+- (BOOL)isCacheEnabled;
+
+/**
+ *  将与cache相关的3个字典对象从内存中，保存到本地
+ */
+- (void)saveCache;
 
 @end

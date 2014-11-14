@@ -68,7 +68,7 @@
 }
 
 + (NSString *) getDocumentsPath {
-    return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    return nil;
 }
 
 + (NSString *) getCachesPath {

@@ -12,6 +12,7 @@
 		218667B01A0DF7B200340FEF /* NSDate+RFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = 218667AE1A0DF7B200340FEF /* NSDate+RFC1123.m */; };
 		218667B31A0DFAC000340FEF /* NetworkEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 218667B21A0DFAC000340FEF /* NetworkEngine.m */; };
 		218667B61A0DFAD500340FEF /* NetworkOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 218667B51A0DFAD500340FEF /* NetworkOperation.m */; };
+		94E8CABA1A1469B400C89871 /* MyFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 94E8CAB91A1469B400C89871 /* MyFileManager.m */; };
 		94F24A421A0B19230044158C /* MyOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 94F24A411A0B19230044158C /* MyOperation.m */; };
 		94F54BDB1A130037001D3E86 /* ObserveRealationShip.m in Sources */ = {isa = PBXBuildFile; fileRef = 94F54BDA1A130037001D3E86 /* ObserveRealationShip.m */; };
 		94F60C741A088A03001D62E3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F60C731A088A03001D62E3 /* Foundation.framework */; };
@@ -60,6 +61,8 @@
 		218667B41A0DFAD500340FEF /* NetworkOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkOperation.h; sourceTree = "<group>"; };
 		218667B51A0DFAD500340FEF /* NetworkOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkOperation.m; sourceTree = "<group>"; };
 		94BCA8D51A08AA0000479BE9 /* MyNetworkKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyNetworkKit.h; sourceTree = "<group>"; };
+		94E8CAB81A1469B400C89871 /* MyFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyFileManager.h; sourceTree = "<group>"; };
+		94E8CAB91A1469B400C89871 /* MyFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyFileManager.m; sourceTree = "<group>"; };
 		94F24A401A0B19230044158C /* MyOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MyOperation.h; path = ../MyOperation.h; sourceTree = "<group>"; };
 		94F24A411A0B19230044158C /* MyOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MyOperation.m; path = ../MyOperation.m; sourceTree = "<group>"; };
 		94F54BD91A130037001D3E86 /* ObserveRealationShip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObserveRealationShip.h; sourceTree = "<group>"; };
@@ -124,6 +127,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		94E8CAB71A14699C00C89871 /* tool */ = {
+			isa = PBXGroup;
+			children = (
+				94E8CAB81A1469B400C89871 /* MyFileManager.h */,
+				94E8CAB91A1469B400C89871 /* MyFileManager.m */,
+			);
+			name = tool;
+			sourceTree = "<group>";
+		};
 		94F54BD81A13000E001D3E86 /* KVO */ = {
 			isa = PBXGroup;
 			children = (
@@ -216,6 +228,7 @@
 		94F60CA81A088A22001D62E3 /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				94E8CAB71A14699C00C89871 /* tool */,
 				94F54BD81A13000E001D3E86 /* KVO */,
 				94FAC43D1A0CAC4F007CFC58 /* Categories */,
 				94F60CA91A088A3B001D62E3 /* Reachability */,
@@ -362,6 +375,7 @@
 				94FAC4401A0CAC84007CFC58 /* NSString+MyNetworkKitExtension.m in Sources */,
 				94FAC4481A0CCB21007CFC58 /* UIImageView+MyNetworkKitExtension.m in Sources */,
 				218667B31A0DFAC000340FEF /* NetworkEngine.m in Sources */,
+				94E8CABA1A1469B400C89871 /* MyFileManager.m in Sources */,
 				218667B01A0DF7B200340FEF /* NSDate+RFC1123.m in Sources */,
 				94F60CAF1A088B91001D62E3 /* Reachability.m in Sources */,
 				218667AF1A0DF7B200340FEF /* NSData+MKBase64.m in Sources */,

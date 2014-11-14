@@ -56,10 +56,12 @@
     }else if ([url hasPrefix:@"https://"]){
         api = [url substringFromIndex:7];
     }
+//    
+//    NSDictionary * dict = @{@"name":@"zs" , @"age":@19};
+//    [dict writeToFile:@"/Users/wadexiong/Desktop/plist" atomically:YES];
     
-    
-    
-    
+    NSDictionary * ddd = [NSDictionary dictionaryWithContentsOfFile:@"/Users/wadexiong/Desktop/plist"];
+
     
 }
 
@@ -75,7 +77,5 @@
 //    }
 }
 
-    
-    
 
 @end
