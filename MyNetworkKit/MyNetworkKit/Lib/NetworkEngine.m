@@ -611,6 +611,10 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
         [self.memoryCacheDict removeAllObjects];
         //2) key字典
         [self.memoryCacheKeysArray removeAllObjects];
+        
+        //将oepration的缓存设置参数列表写入本地
+        NSString * cacheValidParamsPath = [[self cacheDirectoryName] stringByAppendingPathComponent:@"plist"];
+        [self.cacheValidParams writeToFile:cacheValidParamsPath atomically:YES];
     }
 }
 
