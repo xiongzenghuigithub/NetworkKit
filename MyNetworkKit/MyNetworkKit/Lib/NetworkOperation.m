@@ -14,8 +14,14 @@
 @interface NetworkOperation () <NSCoding , NSCopying , NSURLConnectionDelegate>
 
 //TODO: Operation对象的所有的私密属性
-@property (nonatomic, copy) NSString * uniqueStr;                                                 //返回NSString分类创建的唯一字符串
-@property (nonatomic, strong) NSMutableArray * downloadStreams;                                   //保存所有的下载流
+@property (nonatomic, copy) NSString * uniqueStr;                                  //返回NSString分类创建的唯一字符串
+@property (nonatomic, strong) NSMutableArray * downloadStreams;                    //保存所有的下载流
+
+//TODO: NSURLConnection 、NSURLResponse
+@property (nonatomic, strong) NSURLConnection * connection;
+@property (nonatomic, strong) NSURLResponse * response;
+
+@property (nonatomic, assign) BOOL isCancelled;
 
 #if TARGET_OS_IPHONE
 @property (nonatomic, assign) UIBackgroundTaskIdentifier backgroudTaskId;
@@ -436,19 +442,6 @@
     }
 }
 
-#pragma mark - operation.response
-//TODO: 返回operation对象的response data
-- (NSData *) responseData {
-    return [self responseData];
-}
-
-//TODO: 返回operation对象的response data -》 JSon
-- (id)responseJSON {
-    NSError * err;
-    id dict = [NSJSONSerialization JSONObjectWithData:[self responseData] options:NSJSONReadingAllowFragments error:&err];
-    if (err) NSLog(@"response json 解析出错: %@" , [err localizedDescription]);
-    return dict;
-}
 
 //TODO: 返回当前operation对象的response data是否已经被缓存
 - (BOOL)isCachedResponse {
@@ -509,17 +502,49 @@
 
 //线程体
 - (void)main {
+    
     @autoreleasepool {
         [self start];
     }
 }
 
-//开启线程
-- (void)start {    //将当前operation dispatch 到一个新的线程上执行
+//TODO: 申请后台执行的task
+- (void)start {
     
+#if TARGET_OS_IPHONE
+    
+    //1. (异步) 申请后台执行一个task
+    _backgroudTaskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        
+        //1.1 (异步) 执行task执行超时后的回到代码
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            //1.1.1 告诉iOS系统删除task
+            if (_backgroudTaskId != UIBackgroundTaskInvalid) {
+                [[UIApplication sharedApplication] endBackgroundTask:_backgroudTaskId];
+                _backgroudTaskId = UIBackgroundTaskInvalid;
+            
+                //1.1.2 回收创建的对象
+                [self cancel];
+            }
+        });
+    }];
+    
+#endif
+    
+    if (_isCancelled == NO) {   //执行网络请求
+        
+        //2. (异步) 执行task任务要做的事
+        //to do ...
+        
+    } else {    //operation已经取消
+        
+        //3. (异步) 提交task已经完成
+        [self endBackgroundTask];
+    }
 }
 
-//TODO: 结束后台执行的长时间任务
+//TODO: (异步) 结束申请后台执行的长时间任务
 - (void)endBackgroundTask {
 #if TARGET_OS_IPHPE
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -529,6 +554,55 @@
         }
     });
 #endif
+}
+
+
+/**
+ *  释放所有对象
+ */
+- (void)cancel {
+    
+    if ([self isFinished]) {
+        return;
+    }
+    
+    //TODO: 互斥访问 @synchronized(){}
+    @synchronized(self) {
+        
+        self.isCancelled = YES;
+        self.connection = nil;
+        self.response = nil;
+        
+        [self.responseBlockList removeAllObjects];
+        self.responseBlockList = nil;
+        
+        [self.responseErrorBlockList removeAllObjects];
+        self.responseErrorBlockList = nil;
+        
+        [self.errorBlockList removeAllObjects];
+        self.errorBlockList = nil;
+        
+        [self.notModifiedHandlerList removeAllObjects];
+        self.notModifiedHandlerList = nil;
+        
+        [self.downloadBlockList removeAllObjects];
+        self.downloadBlockList = nil;
+        
+        for (NSOutputStream * output in self.downloadStreams) {
+            [output close];
+        }
+        
+        self.cacheHandler = nil;
+        
+        if (self.state == NetworkOperationStateExecuting) {
+            self.state = NetworkOperationStateFinished;
+        }
+        
+        [self endBackgroundTask];
+    }
+    
+    [super cancel];
+    
 }
 
 - (BOOL)isConcurrent {  //返回YES： 使用 并发+dispatch 执行
@@ -550,5 +624,50 @@
 
 #pragma mark - NSURLConnectionDelegate
 
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    
+}
+
+- (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
+    
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    
+}
+
+- (NSString*)languagesFromLocale {
+    return [NSString stringWithFormat:@"%@, en-us", [[NSLocale preferredLanguages] componentsJoinedByString:@", "]];
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    
+}
+
+#pragma mark - operation  response  data
+
+- (NSData *) responseData {
+    return [self responseData];
+}
+
+-(NSString*)responseString {
+    return nil;
+}
+
+-(NSString*) responseStringWithEncoding:(NSStringEncoding) encoding {
+    return nil;
+}
+
+- (id)responseJSON {
+    NSError * err;
+    id dict = [NSJSONSerialization JSONObjectWithData:[self responseData] options:NSJSONReadingAllowFragments error:&err];
+    if (err) NSLog(@"response json 解析出错: %@" , [err localizedDescription]);
+    return dict;
+}
 
 @end
