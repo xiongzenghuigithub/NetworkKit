@@ -15,9 +15,13 @@
 
 //TODO: Operation对象的所有的私密属性
 @property (nonatomic, copy) NSString * uniqueStr;                                                 //返回NSString分类创建的唯一字符串
-
 @property (nonatomic, strong) NSMutableArray * downloadStreams;                                   //保存所有的下载流
-                                               
+
+#if TARGET_OS_IPHONE
+@property (nonatomic, assign) UIBackgroundTaskIdentifier backgroudTaskId;
+#endif
+
+- (void)endBackgroundTask;
 
 @end
 
@@ -47,6 +51,7 @@
     [aCoder encodeObject:self.responseErrorBlockList forKey:@"responseErrorBlockList"];
     [aCoder encodeObject:self.errorBlockList forKey:@"errorBlockList"];
     [aCoder encodeObject:self.downloadStreams forKey:@"downloadStreams"];
+    [aCoder encodeObject:self.notModifiedHandlerList forKey:@"notModifiedHandlerList"];
 }
 
 #pragma mark - NSCoding代理 - initWithCoder: 解码
@@ -73,7 +78,7 @@
     self.responseErrorBlockList = [aDecoder decodeObjectForKey:@"responseErrorBlockList"];
     self.errorBlockList = [aDecoder decodeObjectForKey:@"errorBlockList"];
     self.downloadStreams = [aDecoder decodeObjectForKey:@"downloadStreams"];
-    
+    self.notModifiedHandlerList = [aDecoder decodeObjectForKey:@"notModifiedHandlerList"];
     
     return self;
 }
@@ -99,10 +104,11 @@
     [theCopy setCacheHandler:[self.cacheHandler copy]];
     [theCopy setResponseBlockList:[self.responseBlockList copy]];
     [theCopy setUploadBlockList:[self.uploadBlockList copy]];
-    [theCopy setDownloadStreams:[self.downloadBlockList copy]];
+    [theCopy setDownloadBlockList:[self.downloadBlockList copy]];
     [theCopy setResponseErrorBlockList:[self.responseErrorBlockList copy]];
     [theCopy setErrorBlockList:[self.errorBlockList copy]];
     [theCopy setDownloadStreams:[self.downloadStreams copy]];
+    [theCopy setNotModifiedHandlerList:[self.notModifiedHandlerList copy]];
     
     return theCopy;
 }
@@ -127,10 +133,10 @@
     [theMutableCopy setCacheHandler:[self.cacheHandler mutableCopy]];
     [theMutableCopy setResponseBlockList:[self.responseBlockList mutableCopy]];
     [theMutableCopy setUploadBlockList:[self.uploadBlockList mutableCopy]];
-    [theMutableCopy setDownloadStreams:[self.downloadBlockList mutableCopy]];
     [theMutableCopy setResponseErrorBlockList:[self.responseErrorBlockList mutableCopy]];
     [theMutableCopy setErrorBlockList:[self.errorBlockList mutableCopy]];
     [theMutableCopy setDownloadStreams:[self.downloadStreams mutableCopy]];
+    [theMutableCopy setNotModifiedHandlerList:[self.notModifiedHandlerList mutableCopy]];
     
     return theMutableCopy;
 }
@@ -159,6 +165,8 @@
 //}
 
 
+#pragma mark - operation settings
+
 //TODO: 判断当前operation能不能使用缓存功能
 - (BOOL)isCachable {
     
@@ -166,7 +174,7 @@
     if (self.shouldNotCacheResponse) return NO;
     
     //2. 只有GET请求可以使用缓存response
-    if (![[[self request] HTTPMethod] isEqualToString:@"GET"]) return NO;
+    if ([[[self request] HTTPMethod] isEqualToString:@"GET"] == NO) return NO;
     
     //3. 当GET请求使用https协议时 , 是否可以缓存response
     if ([[[[[self request] URL] scheme] lowercaseString] isEqualToString:@"https"]) return self.shouldCacheResponseViaHTTPS;
@@ -190,7 +198,7 @@
     //保存
     _freezable = freezable;
     
-    //如果是冻结operation， 并且唯一字符串为空，构造一个唯一的字符串 （让operation.uniqueId多加一个唯一字符串 --> 独一无二）
+    //如果是冻结operation，operation.uniqueId多加一个唯一字符串
     if (freezable == YES && _uniqueStr == nil) {
         _uniqueStr = [NSString my_uniqueString];
     }
@@ -224,7 +232,7 @@
     return [uniqueIdForOperation my_md5];
 }
 
-//TODO: 设置手动发出KVO
+//TODO: 设置手动发出KVO通知
 + (BOOL)automaticallyNotifiesObserversForKey: (NSString *)theKey {
     
     BOOL isAutomic;
@@ -278,7 +286,7 @@
 
 }
 
-
+#pragma mark - 创建oepration
 //TODO: Operation create instance
 - (id)initWithURL:(NSString *)reqURL ParamDict:(NSDictionary *)dict ReqMethod:(NSString *)method {
     
@@ -291,6 +299,8 @@
         self.imageBlockList = [NSMutableArray array];
         self.responseErrorBlockList = [NSMutableArray array];
         self.errorBlockList = [NSMutableArray array];
+        self.notModifiedHandlerList = [NSMutableArray array];
+        self.downloadStreams = [NSMutableArray array];
     
         //初始化post数据的编码
         self.stringEncoding = NSUTF8StringEncoding;
@@ -370,6 +380,7 @@
     }
 }
 
+#pragma mark - 更新operation的属性值
 -(void) updateOperationBasedOnPreviousHeaders:(NSMutableDictionary*) headers {
     
     NSString * lastModify = headers[@"Last-Modified"];
@@ -392,10 +403,152 @@
     [self.downloadBlockList addObjectsFromArray:operation.downloadBlockList];
     [self.downloadStreams addObjectsFromArray:operation.downloadStreams];
     [self.errorBlockList addObjectsFromArray:operation.errorBlockList];
+    [self.notModifiedHandlerList addObjectsFromArray:operation.notModifiedHandlerList];
+}
+
+#pragma mark - operation 添加回调Block
+//TODO: 设置operation ， 请求成功获取response的回调代码 ， 将Block添加到数组
+- (void) addCompletBlock:(NKResponseBlock) complet ErrorBlock:(NKResponseErrorBlock) error {
+    if (complet) [self.responseBlockList addObject:complet];
+    if (error) [self.responseErrorBlockList addObject:error];
+}
+
+- (void) addOperaitonStateChangedBlock:(NKOperationStateChangedBlock) complet {
+    if (complet) self.operationStateChanegedHandler = complet;
+}
+
+//TODO: 设置operation ， 当反服务器返回304的回调代码
+- (void) onNotModified:(NKVoidBlock) complet {
+    if (complet) [self.notModifiedHandlerList addObject:complet];
+}
+
+//TODO: 设置operation ， 下载时的回调代码
+- (void) onDownloadProgressChanged:(NKProgressBlock) downloadProgressBlock {
+    if (downloadProgressBlock) [self.downloadBlockList addObject:downloadProgressBlock];
+}
+
+
+//TODO: 添加一个输出流 ，并使其轮巡
+-(void) addDownloadStream:(NSOutputStream*) outputStream {
+    if (outputStream) {
+        [outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+        [self.downloadStreams addObject:outputStream];
+    }
+}
+
+#pragma mark - operation.response
+//TODO: 返回operation对象的response data
+- (NSData *) responseData {
+    return [self responseData];
+}
+
+//TODO: 返回operation对象的response data -》 JSon
+- (id)responseJSON {
+    NSError * err;
+    id dict = [NSJSONSerialization JSONObjectWithData:[self responseData] options:NSJSONReadingAllowFragments error:&err];
+    if (err) NSLog(@"response json 解析出错: %@" , [err localizedDescription]);
+    return dict;
+}
+
+//TODO: 返回当前operation对象的response data是否已经被缓存
+- (BOOL)isCachedResponse {
+    return YES;
+}
+
+
+- (NSString *)httpMethod {
+    return self.request.HTTPMethod;
+}
+
+
+#pragma mark - 设置operation的状态
+- (void)setState:(NetworkOperationState)aState {
+    
+    //1. KVO
+    switch (aState) {
+        case NetworkOperationStateReady:
+            [self willChangeValueForKey:@"isReady"];
+            break;
+            
+        case NetworkOperationStateExecuting:
+            [self willChangeValueForKey:@"isReady"];
+            [self willChangeValueForKey:@"isExecuting"];
+            break;
+            
+        case NetworkOperationStateFinished:
+            [self willChangeValueForKey:@"isExecuting"];
+            [self willChangeValueForKey:@"isFinished"];
+            break;
+    }
+    
+    _state = aState;
+    
+    switch (aState) {
+        case NetworkOperationStateReady:
+            [self didChangeValueForKey:@"isReady"];
+            break;
+            
+        case NetworkOperationStateExecuting:
+            [self didChangeValueForKey:@"isExecuting"];
+            [self didChangeValueForKey:@"isReady"];
+            break;
+            
+        case NetworkOperationStateFinished:
+            [self didChangeValueForKey:@"isExecuting"];
+            [self didChangeValueForKey:@"isFinished"];
+            break;
+    }
+    
+    //2. 执行传入的当operation状态发送改变时候执行的Block
+    if (self.operationStateChanegedHandler) {
+        self.operationStateChanegedHandler(self);
+    }
+}
+
+#pragma mark - NSOperation实现并发必须实现的方法
+
+//线程体
+- (void)main {
+    @autoreleasepool {
+        [self start];
+    }
+}
+
+//开启线程
+- (void)start {    //将当前operation dispatch 到一个新的线程上执行
+    
+}
+
+//TODO: 结束后台执行的长时间任务
+- (void)endBackgroundTask {
+#if TARGET_OS_IPHPE
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (_backgroudTaskId != UIBackgroundTaskInvalid) {
+            [[UIApplication sharedApplication] endBackgroundTask:self.backgroudTaskId];
+            self.backgroudTaskId = UIBackgroundTaskInvalid;
+        }
+    });
+#endif
+}
+
+- (BOOL)isConcurrent {  //返回YES： 使用 并发+dispatch 执行
+    return YES;
 }
 
 - (BOOL)isFinished {
     return (self.state == NetworkOperationStateFinished);
 }
+
+- (BOOL) isReady {
+    return (self.state == NetworkOperationStateReady && [super isReady]);
+}
+
+- (BOOL) isExecuting {
+    return (self.state == NetworkOperationStateExecuting);
+}
+
+
+#pragma mark - NSURLConnectionDelegate
+
 
 @end

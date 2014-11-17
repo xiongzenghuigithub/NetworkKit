@@ -11,10 +11,14 @@
 #import "MyOperation.h"
 
 #import "NetworkEngine.h"
+#import "NetworkOperation.h"
 
 
 @interface ViewController () {
     NSString * _name;
+    NetworkEngine * engine;
+    NetworkOperation * op;
+    UIBackgroundTaskIdentifier backgroudTaskId;
 }
 
 @end
@@ -32,49 +36,51 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    //1. Engine (NSOperationQueue)
+    engine = [[NetworkEngine alloc] initWithHostName:HostName CustomHeaderFileds:nil Port:nil];
+    [engine useCache];
+    
+    //2. NSOperation
+    op = [engine operationWithApiPath:@"v1/deal/get_all_id_list" ParamsDict:nil HttpReqMethod:@"GET"];
+    
+    //3. NSOperation setFreezeble
+    [op setFreezable:YES];
+    
+    //4. add call back
+    [op addCompletBlock:^(NetworkOperation *completCachedOpeation) {
+        NSLog(@"completCachedOpeation = %@ " , completCachedOpeation);
+    } ErrorBlock:^(NetworkOperation *completOperation, NSError *err) {
+        NSLog(@"err = %@ " , err);
+    }];
+    
+    //5. engine enQueue operation
+    [engine enqueueOperation:op];
 
-
-//    Reachability * r1 = [Reachability reachableWithHostName:@"www.baidu.com"];
-//    
-//    [r1 startNotifier];
-//    
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveNotifier:) name:kReachabilityChangedNotification object:nil];
-    
-    UIButton * btn = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn.frame = CGRectMake(20, 100, 100, 50);
-    [btn addTarget:self action:@selector(test) forControlEvents:UIControlEventTouchUpInside];
-    btn.backgroundColor = [UIColor redColor];
-    [self.view addSubview:btn];
-    
-    
-    
-    NSString * url = @"http://dawdawdawdw";
-    
-    NSString * api = @"";
-    if ([url hasPrefix:@"http://"]) {
-        api = [url substringFromIndex:6];
-    }else if ([url hasPrefix:@"https://"]){
-        api = [url substringFromIndex:7];
-    }
-//    
-//    NSDictionary * dict = @{@"name":@"zs" , @"age":@19};
-//    [dict writeToFile:@"/Users/wadexiong/Desktop/plist" atomically:YES];
-    
-    NSDictionary * ddd = [NSDictionary dictionaryWithContentsOfFile:@"/Users/wadexiong/Desktop/plist"];
-
-    
 }
 
-#pragma mark - 接收到网络状态发生改变后的通知 , 并从通知中取出Reachability对象
-- (void)receiveNotifier:(NSNotification *)notify {
-    id obj = [notify object];
-    NSLog(@"notify = %@" , notify);
-}
+- (void)backgroudTaskMudule {
+    
+    //1. applay
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        //2. begin task
+        backgroudTaskId =[[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^(void) {
+            
+            //3. do some things ..
+            
+            //4. end task
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                if (backgroudTaskId != UIBackgroundTaskInvalid) {
+                    [[UIApplication sharedApplication] endBackgroundTask:backgroudTaskId];
+                    backgroudTaskId = UIBackgroundTaskInvalid;
+                    NSLog(@"\n1\n");
+                }
+            });
+        }];
+    });
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-//    if (object == _name && [keyPath isEqualToString:@"name"]) {
-        NSLog(@"----------name变量值发生改变------------");
-//    }
 }
 
 

@@ -230,4 +230,9 @@ typedef void (^ReachabulityChangedStatus)(NetworkStatus * status);
  */
 - (void)saveCache;
 
+/**
+ *  创建request header 标示当前请求服务器的客户端类型(iOS , Android ...)
+ */
+- (NSMutableDictionary *)createRequestHeader;
+
 @end

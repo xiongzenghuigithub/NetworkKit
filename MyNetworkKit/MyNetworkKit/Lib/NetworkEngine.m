@@ -53,7 +53,6 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
             _sharedNetworkQueue = [[NSOperationQueue alloc] init];
             
             //TODO: 1)使用当前类的NSObject 观察 _sharedNetworkQueue值变化
-            //2)在 +方法中, [self self] --> 获取当前类的NSObject
             [_sharedNetworkQueue addObserver:[self self] forKeyPath:@"operationCount" options:0 context:NULL];
             [_sharedNetworkQueue setMaxConcurrentOperationCount:6];
         });
@@ -76,11 +75,13 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
 }
 
 - (id)initWithHostName:(NSString *)hostName CustomHeaderFileds:(NSDictionary *)headersDict {
-    return [self initWithHostName:hostName Port:0 CustomHeaderFileds:headersDict];
+    return [self initWithHostName:hostName CustomHeaderFileds:headersDict Port:0];
 }
 
 //TODO: 所有的 initWithHostName函数 都在这个函数处理
-- (id)initWithHostName:(NSString *)hostName Port:(int)port CustomHeaderFileds:(NSDictionary *)headersDict {
+- (id)initWithHostName:(NSString *) hostName
+    CustomHeaderFileds:(NSDictionary *) headersDict
+                  Port:(int) port {
     
     /**
      *     创建Engine时要做的事:
@@ -99,7 +100,7 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
      */
     
     //1. 调用 [super init]
-    if ((self = [super init]) == nil) {
+    if ((self = [super init]) != nil) {
         
         self.port = port;      //保存服务器端口
         
@@ -114,7 +115,8 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
             
             //1) 注册与主机连接的状态变化的通知 , 等待接收到Reachability对象完成对HostName网络连接状态变化监听的结果
             [[NSNotificationCenter defaultCenter] addObserver:self
-                                                     selector:@selector(didReceiveReachabilityWithHostStatusChanged:) name:kReachabilityChangedNotification         //通知key 定义在 Reachability中
+                                                     selector:@selector(didReceiveReachabilityWithHostStatusChanged:)
+                                                         name:kReachabilityChangedNotification
                                                        object:nil];
             
             //2) 获取与指定主机名的连接引用: SCNetworkReachabilityRef
@@ -154,7 +156,7 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
     }
     
     //5. 默认设置
-    self.customOperationSubclass = [NetworkEngine class];       //指定当前Engine使用的operation的类型(1.基类  2.框架使用者自定义的)
+    self.customOperationSubclass = [NetworkOperation class];       //指定当前Engine使用的operation的类型(1.基类  2.框架使用者自定义的)
     self.shouldSendAcceptLanguageHeader = YES;                  //默认使用语言国际化
     
     return self;
@@ -246,18 +248,17 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
     
     //2. 完成拼接除开参数的完整 api请求URL
     NSMutableString * fullApiPath = [NSMutableString string];
-    NSString * api = @"";
     
     //去掉API路径包含的 "/"
     if ([apiPath hasPrefix:@"/"]) {
-        api = [apiPath substringFromIndex:1];
+        apiPath = [apiPath substringWithRange:NSMakeRange(1, [apiPath length])];
     }
     
     //确定使用http or https
     [fullApiPath appendString:((ssl) ? @"https://" : @"http://")];
     
     //URL = http://www.baidu.com/news/search 或 https://www.baidu.com/news/search
-    [fullApiPath appendString:[NSString stringWithFormat:@"%@/%@", [self hostName] , api]];
+    [fullApiPath appendString:[NSString stringWithFormat:@"%@/%@", [self hostName] , apiPath]];
     
     return [self operationWithCompletURLString:fullApiPath params:dict HttpMethod:method];
 }
@@ -277,12 +278,6 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
     op.shouldSendAcceptLanguageHeader = self.shouldSendAcceptLanguageHeader;
     
     return op;
-}
-
-
-
-- (void)setCustomOperationSubclass:(Class)cls {
-    self.customOperationSubclass = cls;
 }
 
 
@@ -324,23 +319,17 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
         return;
     
     __weak NetworkEngine * weakSelf = self;
-
+    
     //TODO: dispatch_aysnc global_queue operation的各种代码组装
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            
-        // 1. 先给operation设置 , 怎么处理缓存response data的代码
+        
+        // 1. 先给operation预先设置, 缓存response data的代码
         [operation setCacheHandler:^(NetworkOperation *completCachedOpeation) {
             
-            //获取当前operation的唯一id值(unique key)
             NSString * uniqueId = [completCachedOpeation uniqueIdentifier];
-            
-            //把当前operation包含的request对应的response , 按照operation的id值 保存起来
             [weakSelf saveOperation:[completCachedOpeation responseData] forKey:uniqueId];
-            
-            //把当前operation包含的cacheHeaders , 按照operation的id值 保存起来 (以后通过cacheHeaders中保存cache数据的过期时间)
             [weakSelf.cacheValidParams setObject:[completCachedOpeation cacheHeaders] forKey:uniqueId];
         }];
-        
         
         
         //以下判断是在初始化operation的时候 , 并没有执行operation (发起请求)
@@ -369,7 +358,7 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
             //2.1
             if (cachedResponseData) {
                 
-                //2.1.1
+                //2.1.1- (void)setResponseData:(NSData *)responseData
                 //TODO: dispatch_aysnc main_queue 给operation设置response data
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [operation setResponseData:cachedResponseData];
@@ -410,13 +399,13 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
                 
                 //TODO: dispatch_async operationQueue
                 dispatch_async(self.operationQueue, ^{
-                   
+                    
                     BOOL operationFinished = NO;
                     NSArray * operations = [_sharedNetworkQueue operations];
                     NSUInteger index = [operations indexOfObject:operation];  //找到当前operation是否已经存在于队列
                     if (index != NSNotFound) {  //当前创建的operation已经存在于队列
                         
-                        //1. 对于已经存在的operation
+                        //1. 对于已经存在于 _sharedOperationQueue 的operation , 进行属性更新
                         NetworkOperation * queueOperation = [operations objectAtIndex:index];
                         
                         //2. 判断是否执行完毕
@@ -453,10 +442,12 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
         //dispatch block to main queue 后的执行代码
         if ([self.reachability currentReachabilityStatus] == NotReachible) {
             
-            //TODO: 当与主机网络连接不可达时，冻结当前的operation (序列化到本地)
+            //TODO: 当与主机网络连接不可达时，冻结当前的operation (序列化Operation对象 到本地文件)
             [self freezeOperations];
         }
     });
+
+
 }
 
 //TODO: 将operation(包含的response数据)保存起来作为缓存数据
@@ -558,27 +549,34 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
 //TODO: 开启缓存功能
 - (void)useCache {
     
-    //保存response data , key为operation.uniqueIdentifier
+    //保存缓存的operation.responseData
     self.memoryCacheDict = [NSMutableDictionary dictionaryWithCapacity:kMyNetworkKitDefaultCacheSize];
     
-    //保存缓存的response data对应的operation.uniqueIdentifier
-    self.memoryCacheDict = [NSMutableDictionary dictionaryWithCapacity:kMyNetworkKitDefaultCacheSize];
+    //保存operation.uniqueId
+    self.memoryCacheKeysArray = [NSMutableArray arrayWithCapacity:kMyNetworkKitDefaultCacheSize];
     
     //保存oepration的各种缓存参数
     self.cacheValidParams = [NSMutableDictionary dictionary];
     
+    //如果不存在框架创建的自己的缓存根目录 , 创建缓存根目录
+    NSString * cacheRootDir = [[self cacheDirectoryName] stringByAppendingPathComponent:kMyNetworkKitDefualtDirectory];
+    BOOL isFileExists = [[NSFileManager defaultManager] fileExistsAtPath:cacheRootDir isDirectory:nil];
+    if (isFileExists == NO) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:cacheRootDir withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    
     //如果说缓存目录下存在 self.cacheValidParams 对应的文件 ， 从本地文件创建字典
-    NSString * cacheValidParamsPath = [[self cacheDirectoryName] stringByAppendingPathComponent:@"plist"];
+    BOOL isFile = YES;
+    NSString * cacheValidParamsPath = [cacheRootDir stringByAppendingPathComponent:@"plist"];
+    isFileExists = [[NSFileManager defaultManager] fileExistsAtPath:cacheValidParamsPath isDirectory:&isFile];
     
-    BOOL isDir = NO;
-    BOOL isFileExists = [[NSFileManager defaultManager] fileExistsAtPath:cacheValidParamsPath isDirectory:&isDir];
-    
-    if (isDir && isFileExists) {
+    if (isFile && isFileExists) {
         self.cacheValidParams = [NSMutableDictionary dictionaryWithContentsOfFile:cacheValidParamsPath];
     }
     
     //TODO:  设置缓存时，同时监听通知 .  当接收到如下通知，马上将数据保存为缓存数据
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveCache)
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(saveCache)
                                                  name:UIApplicationDidReceiveMemoryWarningNotification  //接收到内存警告
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveCache)
@@ -587,35 +585,39 @@ static NSOperationQueue * _sharedNetworkQueue;                          //保存
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveCache)
                                                  name:UIApplicationWillTerminateNotification            //app将要退出
                                                object:nil];
-
-    
 }
 
 //TODO: 接收到系统通知后，将3个关于缓存先关的字典对象从内存中保存到本地缓存目录下的文件
 - (void)saveCache {
     
-    for (NSString * operationUniqueId in [self.memoryCacheDict allKeys]) { //取出存放response data 对应的key
+    //1. Engine对象持有的所有operation对象.responseData写入文件
+    for (NSString * operationUniqueId in [self.memoryCacheDict allKeys]) {
         
-        //依次将key对应的response data写入到本地缓存文件
         NSString * cacheFilePath = [[self cacheDirectoryName] stringByAppendingPathComponent:operationUniqueId];
         
         if ([[NSFileManager defaultManager] fileExistsAtPath:cacheFilePath]) {
             [[NSFileManager defaultManager] removeItemAtPath:cacheFilePath error:nil];
         }
-        
-        //将response data 缓存字典中保存的 NSData对象 依次写入文件
+
         [self.memoryCacheDict[operationUniqueId] writeToFile:cacheFilePath atomically:YES];
-        
-        //清空缓存字典
-        //1) NSData字典
-        [self.memoryCacheDict removeAllObjects];
-        //2) key字典
-        [self.memoryCacheKeysArray removeAllObjects];
-        
-        //将oepration的缓存设置参数列表写入本地
-        NSString * cacheValidParamsPath = [[self cacheDirectoryName] stringByAppendingPathComponent:@"plist"];
-        [self.cacheValidParams writeToFile:cacheValidParamsPath atomically:YES];
     }
+    
+    //2. 清空缓存字典
+    [self.memoryCacheDict removeAllObjects];
+    [self.memoryCacheKeysArray removeAllObjects];
+    
+    //3. 将oepration的缓存设置参数列表写入本地
+    NSString * cacheValidParamsPath = [[self cacheDirectoryName] stringByAppendingPathComponent:@"plist"];
+    [self.cacheValidParams writeToFile:cacheValidParamsPath atomically:YES];
+}
+
+- (NSMutableDictionary *)createRequestHeader {
+    
+    NSMutableDictionary * headers = [NSMutableDictionary dictionary];
+    headers[@"x-client-identifier"] = @"iOS";
+    //do other settings
+    
+    return headers;
 }
 
 @end

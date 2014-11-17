@@ -14,4 +14,7 @@
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
     #import "MyNetworkKit.h"
+    #define APP_KEY    @"19261138"
+    #define APP_SECRET @"8cd8c95cafac4501a7b8f6c9e0fc8276"
+    #define HostName   @"api.dianping.com"
 #endif

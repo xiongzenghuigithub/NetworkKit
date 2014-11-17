@@ -238,10 +238,10 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
     
     //接收到状态修改的SCNetworkReachabilityRef链接引用，封装在 Reachability对象的reachabilityRef属性中
 #pragma unused(target)
-    Reachability * reachabilty = (__bridge Reachability *)info;//使用 __bridge 将 C语言中得 void * 转换成 OC中得指针类型
+    
+    Reachability * reachabilty = ((__bridge Reachability*)info);
     
     @autoreleasepool {
-        
         [reachabilty reachabilityChanged:flags];
     }
 }
@@ -266,7 +266,6 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
     
     //2. 异步的发送通知表示网络连接已经发送变化、把当前Reachability对象作为通知的参数值 ，发送到消息中心
     dispatch_async(dispatch_get_main_queue(), ^{
-        
         [[NSNotificationCenter defaultCenter] postNotificationName:kReachabilityChangedNotification object:self];
     });
 }
@@ -276,11 +275,11 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
     self.reachabilityObject = self;
     
     SCNetworkReachabilityContext  context = { 0, NULL, NULL, NULL, NULL };
-    context.info = (__bridge void *)self;//__bridge把void*转换为id类型
+    context.info = (__bridge void *)self;
     
     //2. 创建保存要监听的网络连接的队列
     if (self.reachabilitySerialQueue == nil) {
-        self.reachabilitySerialQueue = dispatch_queue_create("com.xzh.network.reachabilityQueue", NULL);//创建串行队列
+        self.reachabilitySerialQueue = dispatch_queue_create("com.xzh.network.reachabilityQueue", NULL);
     }
     
     //3. 设置 接收到监听的网络连接的 网络状态发送变化后，回调context指定的 指定对象的指定函数
@@ -291,13 +290,13 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
 #endif
         
         //release
-#if NEEDS_DISPATCH_RETAIN_RELEASE == 1 //非ARC
-        dispatch_release(self.reachabilitySerialQueue); //非ARC下 ，release释放
+#if NEEDS_DISPATCH_RETAIN_RELEASE == 1
+        dispatch_release(self.reachabilitySerialQueue);
 #else
-        self.reachabilitySerialQueue = nil;             //ARC ，指针为nil
+        self.reachabilitySerialQueue = nil;
 #endif
         //release之间retain过的
-        self.reachabilityObject = nil;                  //减少强引用一次
+        self.reachabilityObject = nil;
         
         return NO;
     }
@@ -313,8 +312,8 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
 #endif
     }
     
-    //5. 所有操作成功执行完毕后，要对self.reachabilityObject进行release一次 --> 让当前指向对象的指针清空，让对象减少被引用的指针数
-    self.reachabilityObject = nil;
+    //5. release一次
+//    self.reachabilityObject = nil;
     
     return YES;//成功开启网络状态监听
 }
@@ -354,10 +353,6 @@ static void ReceiveNetworkStatusUpdateHandle(SCNetworkReachabilityRef target, SC
 #if !(__has_feature(objc_arc))
     [super dealloc];
 #endif
-}
-
-- (void)test {
-    NSLog(@"Reachability - test");
 }
 
 @end

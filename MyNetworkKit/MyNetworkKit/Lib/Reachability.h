@@ -69,6 +69,6 @@ typedef void (^UnReachableBlock)(Reachability * rechability);
 /** 创建一个并行队列 ， 指定并发数 */
 void createConcurrentQueue(const char * queueName, int queueSize, dispatch_group_t * group, dispatch_queue_t * queue);
 
-- (void)test;
+- (void)reachabilityChanged:(SCNetworkConnectionFlags)flags;
 
 @end
