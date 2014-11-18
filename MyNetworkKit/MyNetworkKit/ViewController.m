@@ -36,13 +36,20 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+
     //1. Engine (NSOperationQueue)
     engine = [[NetworkEngine alloc] initWithHostName:HostName CustomHeaderFileds:nil Port:nil];
     [engine useCache];
     
     //2. NSOperation
-    op = [engine operationWithApiPath:@"v1/deal/get_all_id_list" ParamsDict:nil HttpReqMethod:@"GET"];
+    NSDictionary * paramDict = @{
+                             @"client_id":CLIENT_ID,
+                             @"client_secret":CLIENT_SECRET,
+                             @"v":@"20141117",
+                             @"ll":@"40.7,-74",
+                             @"query":@"sushi"
+                             };
+    op = [engine operationWithApiPath:@"v2/venues/search" ParamsDict:paramDict HttpReqMethod:@"GET"];
     
     //3. NSOperation setFreezeble
     [op setFreezable:YES];
