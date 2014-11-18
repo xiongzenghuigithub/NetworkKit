@@ -14,7 +14,7 @@
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
     #import "MyNetworkKit.h"
-    #define CLIENT_ID    @"CMXDTX41EITPPW1GDNKSK3FAB0L4PYFG0HHCBTZ0L3M30QOX"
-    #define CLIENT_SECRET @"ZSJMMWS5HVXQLY4WVIESVRYEF4BTBMAZF3KPEYTP1G1V2BQM"
-    #define HostName   @"api.foursquare.com"
+    #define Client_Id       @"CMXDTX41EITPPW1GDNKSK3FAB0L4PYFG0HHCBTZ0L3M30QOX"
+    #define Client_Secret   @"ZSJMMWS5HVXQLY4WVIESVRYEF4BTBMAZF3KPEYTP1G1V2BQM"
+    #define HostName        @"api.foursquare.com/"
 #endif
